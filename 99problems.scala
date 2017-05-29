@@ -347,3 +347,118 @@ def duplicateN[T](n: Int, list: List[T]): List[T] = {
 val answer15 = duplicateN(3, P15)
 val answerTest15 = testAnswer(answer15 == List('a, 'a, 'a, 'b, 'b, 'b, 'c, 'c, 'c, 'c, 'c, 'c, 'd, 'd, 'd))
 println(f"P15: $answer15 ($answerTest15)")
+
+
+//////////////////////////////////////////////////////////////////////////
+// P16 
+// (**) Drop every Nth element from a list.
+// Example:
+// scala> drop(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+// res0: List[Symbol] = List('a, 'b, 'd, 'e, 'g, 'h, 'j, 'k)
+val P16 = List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)
+
+def drop[T](n: Int, list: List[T]): List[T] = {
+    list.zipWithIndex.filter( it => (it._2 + 1) % n != 0) map (_._1)
+}
+
+val answer16 = drop(3, P16)
+val answerTest16 = testAnswer(answer16 == List('a, 'b, 'd, 'e, 'g, 'h, 'j, 'k))
+println(f"P16: $answer16 ($answerTest16)")
+
+
+//////////////////////////////////////////////////////////////////////////
+// P17 
+// (*) Split a list into two parts.
+// The length of the first part is given. Use a Tuple for your result.
+// Example:
+
+// scala> split(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+// res0: (List[Symbol], List[Symbol]) = (List('a, 'b, 'c),List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+val P17 = List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)
+
+def split[T](n: Int, list: List[T]): (List[T], List[T]) = {
+
+    // trivial with builtins:
+    // list.splitAt(n)
+
+    //recursive
+    (n, list) match {
+        case (_, Nil) => (Nil, Nil)
+        case (0, ls) => (Nil, ls)
+        case (n, h :: t) => {
+            val (start, end) = split(n - 1, t)
+            (h :: start, end)
+        }
+    }
+}
+
+val answer17 = split(3, P17)
+val answerTest17 = testAnswer(answer17 == (List('a, 'b, 'c), List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k)))
+println(f"P17: $answer17 ($answerTest17)")
+
+
+//////////////////////////////////////////////////////////////////////////
+// P18
+// (**) Extract a slice from a list.
+// Given two indices, I and K, the slice is the list containing the elements 
+// from and including the Ith element up to but not including the Kth element of the original list.
+// Start counting the elements with 0.
+// Example:
+
+// scala> slice(3, 7, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+// res0: List[Symbol] = List('d, 'e, 'f, 'g)
+val P18 = List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)
+
+def slice[T](low: Int, high: Int, list: List[T]): List[T] = {
+    list.zipWithIndex.filter( el => el._2 >= low && el._2 < high).map {_._1}
+}
+
+val answer18 = slice(3, 7, P18)
+val answerTest18 = testAnswer(answer18 == List('d, 'e, 'f, 'g))
+println(f"P18: $answer18 ($answerTest18)")
+
+
+//////////////////////////////////////////////////////////////////////////
+// P19 
+// (**) Rotate a list N places to the left.
+// Examples:
+// scala> rotate(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+// res0: List[Symbol] = List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k, 'a, 'b, 'c)
+
+// scala> rotate(-2, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+// res1: List[Symbol] = List('j, 'k, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i)
+val P19 = List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)
+
+def rotate[T](n: Int, list: List[T]): List[T] = {
+    val nBounded = if (list.isEmpty) 0 else n % list.length
+    if (nBounded < 0) rotate(nBounded + list.length, list)
+    else (list drop nBounded) ::: (list take nBounded)
+}
+
+val answer19 = rotate(3, P19)
+val answer19_2 = rotate(-2, P19)
+val answerTest19 = testAnswer(
+    answer19 == List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k, 'a, 'b, 'c) &&
+    answer19_2 == List('j, 'k, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i)
+    )
+println(f"P19: $answer19 + $answer19_2 ($answerTest19)")
+
+
+//////////////////////////////////////////////////////////////////////////
+// P20
+// (*) Remove the Kth element from a list.
+// Return the list and the removed element in a Tuple. Elements are numbered from 0.
+// Example:
+
+// scala> removeAt(1, List('a, 'b, 'c, 'd))
+// res0: (List[Symbol], Symbol) = (List('a, 'c, 'd),'b)
+val P20 = List('a, 'b, 'c, 'd)
+
+def removeAt[T](n: Int, list: List[T]): (List[T], T) = {
+    // val symb = List(n)
+    return (list.zipWithIndex.filter { case  (x: T, y: Int) => y != n }.map{ case (x: T, y: Int) => x }, list(n))
+}
+
+val answer20 = removeAt(1, P20)
+val answerTest20 = testAnswer(answer20 == (List('a, 'c, 'd),'b))
+println(f"P20: $answer20 ($answerTest20)")
